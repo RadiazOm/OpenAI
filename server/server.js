@@ -1,15 +1,22 @@
-// express
+import express from 'express';
+import chatRoutes from './routes/chatRoutes.js'
+const app = express();
 
-// connectie met OpenAI (Azure)
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use('/', chatRoutes)
 
-import { ChatOpenAI } from "@langchain/openai"
+app.listen(process.env.EXPRESS_PORT)
+console.log('LISTENING')
 
-const model = new ChatOpenAI({
-    azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY,
-    azureOpenAIApiVersion: process.env.OPENAI_API_VERSION,
-    azureOpenAIApiInstanceName: process.env.INSTANCE_NAME,
-    azureOpenAIApiDeploymentName: process.env.ENGINE_NAME,
-})
-
-const joke = await model.invoke("pls help i am stuck grandchamp 1 in champion2 how do i get better")
-console.log(joke.content)
+// import { ChatOpenAI } from "@langchain/openai"
+//
+// const model = new ChatOpenAI({
+//     azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY,
+//     azureOpenAIApiVersion: process.env.OPENAI_API_VERSION,
+//     azureOpenAIApiInstanceName: process.env.INSTANCE_NAME,
+//     azureOpenAIApiDeploymentName: process.env.ENGINE_NAME,
+// })
+//
+// const joke = await model.invoke("pls help i am stuck grandchamp 1 in champion2 how do i get better")
+// console.log(joke.content)
