@@ -1,5 +1,6 @@
 import express from "express";
 import { ChatOpenAI } from "@langchain/openai"
+import {chatBot} from "../OpenAI.js";
 
 
 const routes = express.Router();
@@ -41,11 +42,14 @@ routes.post('/chat', async (req, res) => {
     const content = req.body.content
     //
     // res.json({content: req.body.content})
-    const GPTresponse = await model.invoke(content)
+
+    // const GPTresponse = await model.invoke(content)
+
+    const GPTresponse = await chatBot.engineeredPrompt(content)
+
 
     res.json(GPTresponse)
 })
-
 
 
 export default routes

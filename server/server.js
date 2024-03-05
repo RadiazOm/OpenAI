@@ -6,8 +6,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use('/', chatRoutes)
 
-app.listen(process.env.EXPRESS_PORT)
-console.log('LISTENING')
+app.listen(process.env.EXPRESS_PORT, () => {
+    console.log('LISTENING')
+})
 
 // import { ChatOpenAI } from "@langchain/openai"
 //
