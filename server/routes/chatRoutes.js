@@ -1,6 +1,6 @@
 import express from "express";
 import { ChatOpenAI } from "@langchain/openai"
-import {chatBot} from "../OpenAI.js";
+import { chatBot } from "../OpenAI.js";
 
 
 const routes = express.Router();
@@ -11,6 +11,8 @@ const model = new ChatOpenAI({
     azureOpenAIApiInstanceName: process.env.INSTANCE_NAME,
     azureOpenAIApiDeploymentName: process.env.ENGINE_NAME,
 })
+
+const chatBotAi = new chatBot()
 
 routes.options('/chat', function(req, res, next){
     res.header('Allow', 'POST');
@@ -37,7 +39,7 @@ routes.post('/chat', async (req, res) => {
     if (req.body.content === undefined) {
         res.sendStatus(400)
         console.log(req)
-        return
+        return;
     }
     const content = req.body.content
     //
@@ -45,7 +47,7 @@ routes.post('/chat', async (req, res) => {
 
     // const GPTresponse = await model.invoke(content)
 
-    const GPTresponse = await chatBot.engineeredPrompt(content)
+    const GPTresponse = await chatBotAi.engineeredPrompt(content)
 
 
     res.json(GPTresponse)

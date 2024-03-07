@@ -1,65 +1,89 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+import History from './components/History.jsx';
 
 function App() {
+    const [history, setHistory] = useState([]);
+    const [handling, setHandling] = useState(false);
+    const [buttonLocked, setButtonLocked] = useState('');
+    const [response, setResponse] = useState('');
+    const [input, setInput] = useState('');
 
+    // Fetch initial history from localStorage
+    useEffect(() => {
+        const savedHistory = JSON.parse(localStorage.getItem('history')) || [];
+        setHistory(savedHistory);
+    }, []);
 
-    const [handling, setHandling] = useState(false)
+    useEffect(() => {
+        // Save history to localStorage whenever it changes
+        localStorage.setItem('history', JSON.stringify(history));
+    }, [history]);
 
-    const [buttonLocked, setButtonLocked] = useState('')
+    const saveHistory = (message) => {
+        setHistory(prevHistory => [...prevHistory, message]);
+    };
 
-    const [response, setResponse] = useState('')
-
-    const [input, setInput] = useState('')
     const inputChange = (event) => {
-        setInput(event.target.value)
-    }
+        setInput(event.target.value);
+    };
 
     const handleRequest = async (event) => {
         event.preventDefault();
-        if (handling === true) {
-            return;
-        }
-        console.log(handling);
-        setHandling(true)
-        setButtonLocked('opacity-50 cursor-not-allowed')
+        if (handling) return;
 
-        await fetch('http://localhost:8000/chat', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                content: event.target[0].value
-            })
-        })
-            .then((response) => response.json())
-            .then((data) => dataIsLoaded(data))
-            .catch((error) => console.log('data couldnt load: ' + error))
-    }
+        setHandling(true);
+        setButtonLocked('opacity-50 cursor-not-allowed');
+
+        saveHistory(['human', input]);
+
+        try {
+            const response = await fetch('http://localhost:8000/chat', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: input,
+                    history: history
+                })
+            });
+
+            const data = await response.json();
+            dataIsLoaded(data);
+        } catch (error) {
+            console.log('data could not load: ' + error);
+        } finally {
+            setHandling(false);
+            setButtonLocked('');
+        }
+    };
 
     const dataIsLoaded = (data) => {
-        setResponse(data.kwargs.content)
-        setHandling(false)
-        setButtonLocked('')
-    }
+        setResponse(data.kwargs.content);
+        saveHistory(['ai', data.kwargs.content]);
+    };
+
+    const historyList = history.map((message, index) => (
+        <History key={index} message={message[1]} />
+    ));
 
     return (
         <>
             <form method="post" onSubmit={handleRequest}>
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="query">Ask me a question!</label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="query" type="text" name="query" placeholder="Ask a question!" value={input} onChange={inputChange}/>
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="query" type="text" name="query" placeholder="Ask a question!" value={input} onChange={inputChange} />
 
                 <button className={buttonLocked} disabled={handling} type="submit">Send</button>
             </form>
             <div>
-                <p>{response}</p>
+                {historyList}
             </div>
         </>
-    )
+    );
 }
 
-export default App
+export default App;
