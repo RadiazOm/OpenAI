@@ -8,6 +8,11 @@ function App() {
     const [buttonLocked, setButtonLocked] = useState('');
     const [response, setResponse] = useState('');
     const [input, setInput] = useState('');
+    const [buttonColour, setButtonColour] = useState('bg-blue-500 hover:bg-blue-700');
+    const [voiceToggle, setVoiceToggle] = useState(false)
+
+    let synth = window.speechSynthesis
+    let voices = window.speechSynthesis.getVoices()
 
     // Fetch initial history from localStorage
     useEffect(() => {
@@ -20,9 +25,21 @@ function App() {
         if (history.length === 0) {
             return;
         }
-        console.log('saved history')
         localStorage.setItem('history', JSON.stringify(history));
     }, [history]);
+
+    const speak = (text) => {
+        if (synth.speaking || !voiceToggle) {
+            return
+        }
+        console.log(voiceToggle)
+        if (text !== '') {
+            let englishVoice = voices.filter(voice => voice.lang === "en-US")
+            let utterThis = new SpeechSynthesisUtterance(text)
+            utterThis.voice = englishVoice[1]
+            synth.speak(utterThis)
+        }
+    }
 
     const saveHistory = (message) => {
         setHistory(prevHistory => [...prevHistory, message]);
@@ -64,9 +81,27 @@ function App() {
         }
     };
 
+    const deleteHistory = () => {
+        setHistory([])
+        localStorage.setItem('history', JSON.stringify([]));
+    }
+
+    const toggleVoice = () => {
+        console.log('before ' + voiceToggle)
+
+        setVoiceToggle(!voiceToggle)
+        if (voiceToggle) {
+            setButtonColour('bg-blue-500 hover:bg-blue-700');
+        } else {
+            setButtonColour('bg-red-500 hover:bg-red-700');
+        }
+        console.log('after ' + voiceToggle)
+    }
+
     const dataIsLoaded = (data) => {
         setResponse(data.kwargs.content);
         saveHistory(['ai', data.kwargs.content]);
+        speak(data.kwargs.content)
     };
 
     const historyList = history.map((message, index) => (
@@ -75,11 +110,13 @@ function App() {
 
     return (
         <>
+            <button onClick={toggleVoice} className={buttonColour + ' text-white font-bold py-2 px-4 rounded'}>Toggle voice</button>
+            <button onClick={deleteHistory} className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'>delete history</button>
             <form method="post" onSubmit={handleRequest}>
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="query">Ask me a question!</label>
                 <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="query" type="text" name="query" placeholder="Ask a question!" value={input} onChange={inputChange} />
 
-                <button className={buttonLocked} disabled={handling} type="submit">Send</button>
+                <button className={buttonLocked + 'bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow'} disabled={handling} type="submit">Send</button>
             </form>
             <div>
                 {historyList}

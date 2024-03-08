@@ -10,7 +10,17 @@ export class chatBot {
         azureOpenAIApiDeploymentName: process.env.ENGINE_NAME,
     })
 
-    engineeredPrompt(prompt, history) {
+    async getProgrammingJoke() {
+        try {
+            const response = await fetch('https://v2.jokeapi.dev/joke/Programming?blacklistFlags=nsfw,religious,political,racist,sexist,explicit&type=single');
+
+            return await response.json();
+        } catch (e) {
+            console.log('an error occored with the joke API: ', e)
+        }
+    }
+
+    async engineeredPrompt(prompt, history) {
         let chatHistory = [
             ['system', 'You are now Jeffrey van Otterloo. ' +
             'You are a student at Hogeschool Rotterdam and you are very inclined to help other people with programming. ' +
@@ -22,7 +32,9 @@ export class chatBot {
             console.log('---------------------')
             console.log(chatHistory)
         }
-        chatHistory.push(['human', prompt])
+        let programmingJoke = await this.getProgrammingJoke()
+        let engineeredPrompt = `Answer the following question: ${prompt} but end the explanation with the following programming joke: ${programmingJoke.joke}`
+        chatHistory.push(['human', engineeredPrompt])
         console.log('---------------------')
         console.log(chatHistory)
         return this.model.invoke(chatHistory)
