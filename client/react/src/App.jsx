@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import './App.css';
 import History from './components/History.jsx';
 
@@ -19,6 +17,10 @@ function App() {
 
     useEffect(() => {
         // Save history to localStorage whenever it changes
+        if (history.length === 0) {
+            return;
+        }
+        console.log('saved history')
         localStorage.setItem('history', JSON.stringify(history));
     }, [history]);
 
@@ -37,8 +39,6 @@ function App() {
         setHandling(true);
         setButtonLocked('opacity-50 cursor-not-allowed');
 
-        saveHistory(['human', input]);
-
         try {
             const response = await fetch('http://localhost:8000/chat', {
                 method: 'POST',
@@ -51,6 +51,8 @@ function App() {
                     history: history
                 })
             });
+
+            saveHistory(['human', input]);
 
             const data = await response.json();
             dataIsLoaded(data);

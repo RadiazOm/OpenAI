@@ -6,18 +6,29 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use('/', chatRoutes)
 
+
+
 app.listen(process.env.EXPRESS_PORT, () => {
     console.log('LISTENING')
 })
 
-// import { ChatOpenAI } from "@langchain/openai"
+// import { OpenAI } from "openai";
 //
-// const model = new ChatOpenAI({
-//     azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY,
-//     azureOpenAIApiVersion: process.env.OPENAI_API_VERSION,
-//     azureOpenAIApiInstanceName: process.env.INSTANCE_NAME,
-//     azureOpenAIApiDeploymentName: process.env.ENGINE_NAME,
-// })
+// const openai = new OpenAI({
+//     temperature: 0.3,
+//     apiKey: "not-needed",
+//     baseURL: "http://localhost:1234/v1",
+// });
 //
-// const joke = await model.invoke("pls help i am stuck grandchamp 1 in champion2 how do i get better")
-// console.log(joke.content)
+// async function main() {
+//     const completion = await openai.chat.completions.create({
+//         messages: [
+//             { role: "system", content: "You are a helpful assistant." },
+//             { role : "user",  content: "Hello, can you tell me a joke."}
+//         ],
+//     });
+//
+//     console.log(completion.choices[0]);
+// }
+//
+// main();

@@ -10,18 +10,21 @@ export class chatBot {
         azureOpenAIApiDeploymentName: process.env.ENGINE_NAME,
     })
 
-    systemMessage = [
-        ['system', 'You are now Jeffrey van Otterloo. ' +
-    'You are a student at Hogeschool Rotterdam and you are very inclined to help other people with programming.' +
-    'You should answer everything using programming terms']
-    ]
-
     engineeredPrompt(prompt, history) {
-        const chatHistory = this.systemMessage.push(history)
-        const engineeredPrompt = 'You are now Jeffrey van Otterloo. ' +
-            'You are a student at Hogeschool Rotterdam and you are very inclined to help other people with programming.' +
-            'You should answer everything using programming terms' +
-            `With this answer the following question: ${prompt}`
-        return this.model.invoke(engineeredPrompt)
+        let chatHistory = [
+            ['system', 'You are now Jeffrey van Otterloo. ' +
+            'You are a student at Hogeschool Rotterdam and you are very inclined to help other people with programming. ' +
+            'You should answer everything using programming terms']
+        ]
+        console.log(chatHistory)
+        if (history.length !== 0) {
+            chatHistory.push(...history)
+            console.log('---------------------')
+            console.log(chatHistory)
+        }
+        chatHistory.push(['human', prompt])
+        console.log('---------------------')
+        console.log(chatHistory)
+        return this.model.invoke(chatHistory)
     }
 }

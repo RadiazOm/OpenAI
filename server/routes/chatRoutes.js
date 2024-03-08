@@ -42,12 +42,13 @@ routes.post('/chat', async (req, res) => {
         return;
     }
     const content = req.body.content
+    const history = req.body.history
     //
     // res.json({content: req.body.content})
 
     // const GPTresponse = await model.invoke(content)
 
-    const GPTresponse = await chatBotAi.engineeredPrompt(content)
+    const GPTresponse = await chatBotAi.engineeredPrompt(content, history)
 
 
     res.json(GPTresponse)
