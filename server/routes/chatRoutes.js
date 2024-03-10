@@ -44,7 +44,6 @@ routes.use((req, res, next) => {
     next()
 })
 
-
 routes.get('/joke', async (req, res) => {
     const joke = await model.invoke('Can you tell me a funny javascript joke?')
 
@@ -72,7 +71,7 @@ routes.post('/chat', async (req, res) => {
 
     const chatHistory = await chatBotAi.engineeredPrompt(content, history)
 
-    const stream = await fakeModel.stream(chatHistory)
+    const stream = await model.stream(chatHistory)
     for await (const chunk of stream) {
         res.write(chunk.content)
     }

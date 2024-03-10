@@ -30,11 +30,11 @@ EXPRESS_PORT=YOUR-PORT
 
 To start your application, simply start both client and server by going to their respective folders and run the 'dev' command
 
-```bash
+```shell
 C:\Users\your-project-folder\client\react> npm run dev
 ```
 
-```bash
+```shell
 C:\Users\your-project-folder\server> npm run dev
 ```
 
