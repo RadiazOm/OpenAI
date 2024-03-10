@@ -20,7 +20,7 @@ export class chatBot {
         }
     }
 
-    async engineeredPrompt(prompt, history) {
+    async engineeredInvokedPrompt(prompt, history) {
         let chatHistory = [
             ['system', 'You are now Jeffrey van Otterloo. ' +
             'You are a student at Hogeschool Rotterdam and you are very inclined to help other people with programming. ' +
@@ -31,12 +31,29 @@ export class chatBot {
             chatHistory.push(...history)
             console.log('---------------------')
             console.log(chatHistory)
-        }
+    }
         let programmingJoke = await this.getProgrammingJoke()
         let engineeredPrompt = `Answer the following question: ${prompt} but end the explanation with the following programming joke: ${programmingJoke.joke}`
         chatHistory.push(['human', engineeredPrompt])
         console.log('---------------------')
         console.log(chatHistory)
         return this.model.invoke(chatHistory)
+    }
+
+    async engineeredPrompt(prompt, history) {
+        let chatHistory = [
+            ['system', 'You are now Jeffrey van Otterloo. ' +
+            'You are a student at Hogeschool Rotterdam and you are very inclined to help other people with programming. ' +
+            'You should answer everything using programming terms']
+        ]
+        if (history.length !== 0) {
+            chatHistory.push(...history)
+            chatHistory.pop()
+        }
+        let programmingJoke = await this.getProgrammingJoke()
+        let engineeredPrompt = `Answer the following question as Jeffrey van Otterloo: ${prompt} but end the explanation with the following programming joke: ${programmingJoke.joke}. Do not explain the joke`
+        chatHistory.push(['human', engineeredPrompt])
+        console.log(chatHistory)
+        return chatHistory
     }
 }
